@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Student Finance Manager</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body { font-family: Arial, sans-serif; background: #f5f6fa; margin: 0; }
+    .container { max-width: 900px; margin: 40px auto; background: #fff; border-radius: 10px; padding: 32px 24px 16px; box-shadow: 0 0 10px #e1e1e1;}
+    h1 { text-align: center; margin-bottom: 24px;}
+    .dashboard { display: flex; gap: 20px; flex-wrap: wrap;}
+    .widget { border-radius: 6px; background: #f0f2f7; padding: 18px; flex: 1; min-width: 220px;}
+    .goal-bar { height: 10px; background: #dedede; border-radius: 5px; overflow: hidden;}
+    .goal-bar-inner { height: 100%; background: #76c7c0; }
+    .budget-alert { color: #f76161; font-weight: 600; text-align: center; margin-top: 18px;}
+    table { width: 100%; border-collapse: collapse; margin-top: 20px;}
+    th, td { padding: 8px; text-align: left; border-bottom: 1px solid #e1e1e1;}
+    th { background: #f8f8fd;}
+    form { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px;}
+    input, select, button { padding: 8px 10px; border: 1px solid #ccc; border-radius: 4px;}
+    button { background: #00a884; color: #fff; border: none;}
+    button:hover { background: #00916E;}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Student Finance Manager</h1>
+    <form id="expense-form">
+      <input type="text" id="name" placeholder="Expense Name" required>
+      <input type="number" id="amount" placeholder="Amount" required>
+      <select id="category" required>
+        <option value="" selected disabled>Category</option>
+        <option>Food</option>
+        <option>Transport</option>
+        <option>Books</option>
+        <option>Fun</option>
+        <option>Other</option>
+      </select>
+      <input type="date" id="date" required>
+      <button type="submit">Add Expense</button>
+    </form>
+    <div class="dashboard">
+      <div class="widget">
+        <h3>This Month's Spend</h3>
+        <div id="total-spent">₹0</div>
+      </div>
+      <div class="widget">
+        <h3>Goal Progress</h3>
+        <div class="goal-bar"><div id="goal-bar-inner" class="goal-bar-inner" style="width: 0%"></div></div>
+        <small>Target: ₹<span id="goal-amount">10000</span></small>
+      </div>
+    </div>
+    <div id="budget-alert" class="budget-alert" style="display:none;"></div>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Amount</th>
+          <th>Category</th>
+          <th>Date</th>
+        </tr>
+      </thead>
+      <tbody id="expense-list"></tbody>
+    </table>
+  </div>
+  <script>
+    const goalAmount = 10000; // Example monthly goal
+    let totalSpent = 0;
+    let expenses = [];
+    document.getElementById("goal-amount").textContent = goalAmount;
+    document.getElementById("expense-form").addEventListener("submit", function(e){
+      e.preventDefault();
+      const name = document.getElementById("name").value;
+      const amount = parseFloat(document.getElementById("amount").value);
+      const category = document.getElementById("category").value;
+      const date = document.getElementById("date").value;
+      expenses.push({name, amount, category, date});
+      renderExpenses();
+      this.reset();
+    });
+    function renderExpenses() {
+      const tbody = document.getElementById("expense-list");
+      tbody.innerHTML = '';
+      totalSpent = expenses.reduce((acc, ex) => acc + ex.amount, 0);
+      expenses.forEach(exp => {
+        const row = document.createElement("tr");
+        row.innerHTML = `<td>${exp.name}</td><td>₹${exp.amount}</td>
+                         <td>${exp.category}</td><td>${exp.date}</td>`;
+        tbody.appendChild(row);
+      });
+      document.getElementById("total-spent").textContent = ₹${totalSpent};
+      let percent = Math.min(100, (totalSpent/goalAmount)*100);
+      document.getElementById("goal-bar-inner").style.width = percent + "%";
+      let alert = document.getElementById("budget-alert");
+      if(totalSpent > goalAmount){
+        alert.style.display = "block";
+        alert.textContent = "Alert: Over your monthly budget!";
+      } else {
+        alert.style.display = "none";
+      }
+    }
+  </script>
+</body>
+</html>
